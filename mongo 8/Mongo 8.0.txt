@@ -1,0 +1,72 @@
+Mongo 8.0
+
+mongod -> starta o serviço do mongo
+mongosh -> terminal do mongo 
+show dbs -> mostra as databases locais 
+use nome-db -> usa o db indicado 
+db.showcollection -> mostra as collections do db indicado
+
+db.billingCycles.insertOne({name: "January/178", month: 2, year: 2017}) -> insere uma tupla na collection
+
+
+db.billingCycles.updateOne( { name: "Fevereiro/17", month: 2, year: 2017 }, // critério de busca 
+			    { $set: { name: "Fevereiro/17", month: 2, year: 2017 } }, // dados a inserir/atualizar 
+                            { upsert: true } // insere se não encontrar )
+
+
+db.billingCycles.insertOne({
+... name: "Março/17",
+... month: 3,
+... year: 2017,
+... credits: [
+... {name: "Salário", value: 500}
+... ],
+... debts: [
+... {name: "Luz", value: 100,status: "PAGO"},
+... {name: "Telefone", value: 100, status: "PENDENTE"}
+... ]
+... })
+
+
+
+db.billingCycles.find() -> lista todos os dados da collection
+
+db.billingCycles.find().pretty() -> lista todos os dados da collection formatado
+
+db.billingCycles.findOne() -> lista o primeiro dado da collection]
+
+db.billingCycles.findOne({month: 2}) -> lista os dados que encaixam no filtro
+
+db.billingCycles.find({ $or: [{ month: 1 }, { month: 2 }] }) -> filtra com operador lógico ou(or), serve pra e(and) também.
+
+db.billingCycles.find({ credits: { $exists: true } })->filtra com a existência de campo
+
+db.billingCycles.find({year: 2017}).skip(1)-> filtra pelo ano e pula o primeiro registro
+
+db.billingCycles.find({year: 2017}).skip(1)-> filtra pelo ano e pula o primeiro registro e limita a quantidade de resultados a 1
+
+
+
+db.billingcycles.aggregate([ // Inicia uma pipeline de agregação na coleção "billingcycles"
+    {
+        $project: { //transforma cada documento, projetando apenas os campos abaixo
+            credit: { $sum: "$credits.value" }, // Soma os valores do array "credits" e atribui ao campo "credit"
+            debt: { $sum: "$debts.value" }       // Soma os valores do array "debts" e atribui ao campo "debt"
+        }
+    },
+    {
+        $group: { // agrupa todos os documentos da etapa anterior
+            _id: null, // Como o _id é null, agrupa tudo em um único grupo (ou seja, todos os documentos juntos)
+            credit: { $sum: "$credit" }, // Soma o campo "credit" de todos os documentos agrupados
+            debt: { $sum: "$debt" }      // Soma o campo "debt" de todos os documentos agrupados
+        }
+    }
+])
+
+
+
+
+
+db.billingCycles.countDocuments() -> traz a quantidade de dados daquela collection
+db.billingCycles.remove({month}) -> remove dados com base no filtro
+db.dropDatabase() -> exclui a database
